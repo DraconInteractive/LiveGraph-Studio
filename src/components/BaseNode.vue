@@ -41,7 +41,11 @@ const handleConnectable: HandleConnectableFunc = () => true
   <div class="custom-node">
     <div class="node-title">{{ title }}</div>
     <div style="height: 5px;"></div>
-    <div class="node-body">{{ body }}</div>
+    <div class="node-body">
+        <slot name="body">
+            {{ body }}
+        </slot>
+    </div>
 
     <template v-for="(label, index) in outputs ?? []" :key="label">
       <div class="handle-container right" :style="{ top: `${getHandleTop(index)}px` }">
@@ -93,9 +97,9 @@ const handleConnectable: HandleConnectableFunc = () => true
     font-size: 16px;
 }
 
-.node-body
-{
-    font-size: 8px;
+.node-body {
+  padding: 4px 0;
+  word-wrap: break-word;
 }
 
 .handle-container {
