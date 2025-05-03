@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { h, ref } from 'vue'
-import { Background } from '@vue-flow/background'
+import { Background, BackgroundVariant } from '@vue-flow/background'
 import { Controls } from '@vue-flow/controls'
 import { MiniMap } from '@vue-flow/minimap'
-import { VueFlow, useVueFlow, type Node, type Edge } from '@vue-flow/core'
+import { VueFlow, useVueFlow, type Node, type Edge, ConnectionMode } from '@vue-flow/core'
 import CustomNode from './CustomNode.vue'
 import CustomEdge from './CustomEdge.vue'
 
@@ -26,7 +26,7 @@ onConnect((params) => {
 </script>
 
 <template>
-  <div style="height: 100vh">
+  <div style="height: 100vh" class="dark">
     <VueFlow
       v-model:nodes="nodes"
       v-model:edges="edges"
@@ -35,8 +35,9 @@ onConnect((params) => {
       :default-zoom="1.5"
       :min-zoom="0.2"
       :max-zoom="4"
+      :connection-mode="ConnectionMode.Strict"
     >
-      <Background pattern-color="#aaa" :gap="8" />
+      <Background pattern-color="#2e2e2e" :gap="22" :variant="BackgroundVariant.Lines" />
 
       <MiniMap />
 
