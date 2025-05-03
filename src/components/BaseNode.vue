@@ -94,12 +94,15 @@ const handleConnectable: HandleConnectableFunc = () => true
 
 .node-title
 {
-    font-size: 16px;
+    font-size: 12px;
 }
 
 .node-body {
-  padding: 4px 0;
-  word-wrap: break-word;
+  padding: 4px 8px;
+  padding-left: 40px;   /* Push away from left handles */
+  padding-right: 40px;  /* Push away from right handles */
+  word-break: break-word;
+  white-space: pre-line;
 }
 
 .handle-container {

@@ -12,10 +12,12 @@ const props = defineProps(['id', 'data'])
       :inputs="['Exec', 'Message']"
       :outputs="['Exec']"
     >
+    <!--
       <template #body>
         <div style="font-size: 11px; color: #bbb;">
-          Logs the message to the debug console. blah blas
+          <pre></pre>
         </div>
       </template>
+    -->
     </BaseNode>
   </template>
