@@ -11,11 +11,11 @@ const actions = ['👎', '✋', '👍']
 const outputs = ['One', 'Two', 'Three', 'Four']
 const inputs = ['a']
 
-const titlePadding = 20;
-const handleSpacing = 18;
+const titleHeight = 48 // enough room for title + body text
+const handleSpacing = 28
 
-const getHandleTop = (index: number, total: number) => {
-  return titlePadding + (index * handleSpacing)
+const getHandleTop = (index: number) => {
+  return titleHeight + index * handleSpacing
 }
 
 const { updateNodeData } = useVueFlow()
@@ -48,43 +48,44 @@ const handleConnectable: HandleConnectableFunc = (node, connectedEdges) => {
     </div>
 
     <template v-for="(id, index) in outputs" :key="id">
-      <Handle
-        :id="`source-${id}`"
-        type="source"
-        :position="Position.Right"
-        :style="{
-          top: `${(index + 1) * (100 / (outputs.length + 1))}%`,
-          transform: 'translateY(-50%)'
-        }"
-      />
       <div
-        class="handle-label right"
-        :style="{ top: `${(index + 1) * (100 / (outputs.length + 1))}%` }"
+        class="handle-container right"
+        :style="{ top: `${getHandleTop(index)}px` }"
       >
-        {{ id }}
+        <div class="handle-content">
+          <span class="handle-label">{{ id }}</span>
+          <Handle
+            :id="`source-${id}`"
+            type="source"
+            :position="Position.Right"
+            :style="{ transform: 'translateY(-50%)' }"
+          />
+        </div>
       </div>
     </template>
 
+
     <template v-for="(id, index) in inputs" :key="id">
-      <Handle
-        :id="`target-${id}`"
-        type="target"
-        :position="Position.Left"
-        :style="{
-          top: `${(index + 1) * (100 / (inputs.length + 1))}%`,
-          transform: 'translateY(-50%)'
-        }"
-      />
       <div
-        class="handle-label left"
-        :style="{ top: `${(index + 1) * (100 / (inputs.length + 1))}%` }"
+        class="handle-container left"
+        :style="{ top: `${getHandleTop(index)}px` }"
       >
-        {{ id }}
+        <div class="handle-content">
+          <Handle
+            :id="`target-${id}`"
+            type="target"
+            :position="Position.Left"
+            :style="{ transform: 'translateY(-50%)' }"
+          />
+          <span class="handle-label">{{ id }}</span>
+        </div>
       </div>
     </template>
+
     
     <!-- Spacer div to push node height -->
-    <div :style="{ height: `${Math.max(outputs.length, inputs.length) * 18}px` }"></div>
+    <div :style="{ height: `${titleHeight + Math.max(outputs.length, inputs.length) * handleSpacing}px` }"></div>
+
   </div>
 </template>
 
@@ -101,23 +102,46 @@ const handleConnectable: HandleConnectableFunc = (node, connectedEdges) => {
   font-size: 12px;
 }
 
-.handle-label {
+.handle-container {
   position: absolute;
-  font-size: 10px;
-  color: #ccc;
   transform: translateY(-50%);
   pointer-events: none;
 }
 
-.handle-label.right {
-  right: 18px; /* slightly inside the node */
-  text-align: right;
+.handle-container.right {
+  right: 0;
 }
 
-.handle-label.left {
-  left: 18px;
-  text-align: left;
+.handle-container.left {
+  left: 0;
 }
+
+.handle-content {
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+  padding: 0 8px; /* adds space inside node */
+}
+
+.handle-container.right .handle-content {
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.handle-container.left .handle-content {
+  flex-direction: row;
+  justify-content: flex-start;
+}
+
+.handle-label {
+  font-size: 10px;
+  color: #ccc;
+  white-space: nowrap;
+  pointer-events: none;
+  margin: 0 6px;
+}
+
+
 
 .vue-flow__node-toolbar {
   display: flex;
