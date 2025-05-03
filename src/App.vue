@@ -6,18 +6,16 @@ import { MiniMap } from '@vue-flow/minimap'
 import { VueFlow, useVueFlow, type Node, type Edge, ConnectionMode } from '@vue-flow/core'
 import CustomNode from './CustomNode.vue'
 import CustomEdge from './CustomEdge.vue'
+import DebugLogNode from './nodes/DebugLogNode.vue'
 
 const { onConnect, addEdges } = useVueFlow()
 
 const nodes = ref<Node[]>([
-  { id: '1', type: 'input', label: 'Node 1', position: { x: 250, y: 5 } },
-  { id: '2', type: 'output', label: 'Node 2', position: { x: 100, y: 100 } },
   { id: '3', type: 'custom', label: 'Node 3', position: { x: 400, y: 100 } },
+  { id: '4', type: 'debug-log', position: { x: 300, y: 300 } },
 ])
 
 const edges = ref<Edge[]>([
-  { id: 'e1-2', source: '1', target: '2', type: 'custom' },
-  { id: 'e1-3', source: '1', target: '3', animated: true },
 ])
 
 onConnect((params) => {
@@ -46,7 +44,9 @@ onConnect((params) => {
       <template #node-custom="nodeProps">
         <CustomNode v-bind="nodeProps" />
       </template>
-
+      <template #node-debug-log="nodeProps">
+        <DebugLogNode v-bind="nodeProps" />
+      </template>
       <template #edge-custom="edgeProps">
         <CustomEdge v-bind="edgeProps" />
       </template>
