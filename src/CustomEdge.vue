@@ -31,8 +31,8 @@ console.log('Edge Data:', props.data)
   >
     <defs>
       <linearGradient :id="`grad-${props.id}`" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="30%" :stop-color="sourceColor" />
-        <stop offset="70%" :stop-color="targetColor" />
+        <stop offset="42%" :stop-color="sourceColor" />
+        <stop offset="58%" :stop-color="targetColor" />
       </linearGradient>
     </defs>
 
