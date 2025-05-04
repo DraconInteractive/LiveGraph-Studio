@@ -1,14 +1,15 @@
 <script lang="ts" setup>
-import { h, ref } from 'vue'
+import { onMounted, onUnmounted, computed, ref } from 'vue'
 import { Background, BackgroundVariant } from '@vue-flow/background'
 import { Controls, ControlButton } from '@vue-flow/controls'
 import { MiniMap } from '@vue-flow/minimap'
-import { VueFlow, useVueFlow, type Node, type Edge, ConnectionMode } from '@vue-flow/core'
+import { VueFlow, useVueFlow, type Node, type Edge, ConnectionMode, Panel } from '@vue-flow/core'
 import { nodeTypes } from './nodes'
 import Icon from './Icon.vue'
 
 const { onConnect, addEdges, toObject } = useVueFlow()
 
+// Init graph
 const nodes = ref<Node[]>([
   { id: '2', type: 'run', position: { x: 100, y: 100 } },
   { id: '3', type: 'custom', position: { x: 100, y: 300 } },
@@ -25,9 +26,57 @@ const edges = ref<Edge[]>([
   },
 ])
 
+const showNodeMenu = ref(false)
+const searchQuery = ref('')
+
 onConnect((params) => {
   addEdges([params])
 })
+
+// Filtered node types
+const filteredNodeTypes = computed(() =>
+  nodeTypes.filter((n) =>
+    n.type.toLowerCase().includes(searchQuery.value.toLowerCase())
+  )
+)
+
+onMounted(() => {
+  const listener = (e: KeyboardEvent) => {
+    if (e.shiftKey && e.key.toLowerCase() === 'a') {
+      showNodeMenu.value = true
+    } else if (e.key === 'Escape') {
+      showNodeMenu.value = false
+    }
+  }
+  window.addEventListener('keydown', listener)
+  onUnmounted(() => window.removeEventListener('keydown', listener))
+})
+
+// test
+function addNode() {
+  const id = Date.now().toString()
+  
+  nodes.value.push({
+    id,
+    position: { x: 150, y: 50 },
+    type: "debug-log",
+  })
+}
+
+// for window
+function spawnNode(type: string) {
+  const id = Date.now().toString()
+
+  nodes.value.push({
+    id,
+    type,
+    position: { x: 200, y: 200 },
+    data: {}
+  })
+
+  showNodeMenu.value = false
+  searchQuery.value = ''
+}
 
 const handleSave = (): void => {
   console.log('Save clicked')
@@ -64,6 +113,24 @@ function getSanitizedFlow() {
 </script>
 
 <template>
+  <div v-if="showNodeMenu" class="node-menu">
+  <input
+    type="text"
+    placeholder="Search nodes..."
+    v-model="searchQuery"
+    class="node-search"
+    autofocus
+  />
+  <ul class="node-list">
+    <li
+      v-for="node in filteredNodeTypes"
+      :key="node.type"
+      @click="spawnNode(node.type)"
+    >
+      {{ node.type }}
+    </li>
+  </ul>
+</div>
   <div style="height: 100vh" class="dark">
     <VueFlow
       v-model:nodes="nodes"
@@ -109,4 +176,47 @@ function getSanitizedFlow() {
   flex-direction: row !important;
   gap: 8px;
 }
+
+.node-menu {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: #2c2c2c;
+  border: 1px solid #555;
+  border-radius: 8px;
+  padding: 12px;
+  z-index: 10;
+  width: 240px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+.node-search {
+  width: 100%;
+  box-sizing: border-box; /* ✅ include padding/border in width */
+  padding: 6px 8px;
+  font-size: 14px;
+  background: #1c1c1c;
+  color: white;
+  border: 1px solid #444;
+  margin-bottom: 8px;
+}
+
+.node-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.node-list li {
+  padding: 6px 8px;
+  color: white;
+  cursor: pointer;
+}
+
+.node-list li:hover {
+  background: #3a3a3a;
+}
+
 </style>
