@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import { h, ref } from 'vue'
 import { Background, BackgroundVariant } from '@vue-flow/background'
-import { Controls } from '@vue-flow/controls'
+import { Controls, ControlButton } from '@vue-flow/controls'
 import { MiniMap } from '@vue-flow/minimap'
 import { VueFlow, useVueFlow, type Node, type Edge, ConnectionMode } from '@vue-flow/core'
-import CustomEdge from './CustomEdge.vue'
 import { nodeTypes } from './nodes'
+import Icon from './Icon.vue'
 
-const { onConnect, addEdges } = useVueFlow()
+const { onConnect, addEdges, toObject } = useVueFlow()
 
 const nodes = ref<Node[]>([
   { id: '2', type: 'run', position: { x: 100, y: 100 } },
@@ -29,6 +29,16 @@ onConnect((params) => {
   addEdges([params])
 })
 
+const handleSave = (): void => {
+  console.log('Save clicked')
+  console.log(JSON.stringify(toObject(), null, 2)) // Pretty-printed JSON
+
+}
+
+const handleRestore = (): void => {
+  console.log('Restore clicked')
+}
+
 
 </script>
 
@@ -48,7 +58,14 @@ onConnect((params) => {
 
       <MiniMap />
 
-      <Controls />
+      <Controls class="my-controls">
+        <ControlButton @click="handleSave">
+          <Icon name="save" />
+        </ControlButton>
+        <ControlButton @click="handleRestore">
+          <Icon name="restore" />
+        </ControlButton>
+      </Controls>
 
       <template
         v-for="node in nodeTypes"
@@ -59,3 +76,16 @@ onConnect((params) => {
     </VueFlow>
   </div>
 </template>
+
+<style>
+.my-controls
+{
+  transform: scale(1.5); /* increase size */
+  transform-origin: bottom left;
+}
+
+.vue-flow__controls {
+  flex-direction: row !important;
+  gap: 8px;
+}
+</style>
