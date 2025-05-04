@@ -1,45 +1,48 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 import type { EdgeProps } from '@vue-flow/core'
-import { BaseEdge, EdgeLabelRenderer, getBezierPath, useVueFlow } from '@vue-flow/core'
+import { getBezierPath } from '@vue-flow/core'
+import { colorMap, DataType } from "./utils/colorMap"
 
 const props = defineProps<EdgeProps>()
 
-const { removeEdges } = useVueFlow()
+const path = computed(() =>
+  getBezierPath({
+    sourceX: props.sourceX,
+    sourceY: props.sourceY,
+    sourcePosition: props.sourcePosition, // 🔧 add this
+    targetX: props.targetX,
+    targetY: props.targetY,
+    targetPosition: props.targetPosition, // 🔧 and this
+  })[0]
+)
 
-const path = computed(() => getBezierPath(props))
-</script>
+const sourceColor = colorMap[(props.data?.sourceType as DataType) || 'unknown']
+const targetColor = colorMap[(props.data?.targetType as DataType) || 'unknown']
 
-<script lang="ts">
-export default {
-  inheritAttrs: false,
-}
+console.log('Edge Data:', props.data)
+
 </script>
 
 <template>
-  <BaseEdge :path="path[0]" />
+  <svg
+    class="vue-flow__edge-path"
+    style="overflow: visible; position: absolute;"
+  >
+    <defs>
+      <linearGradient :id="`grad-${props.id}`" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="30%" :stop-color="sourceColor" />
+        <stop offset="70%" :stop-color="targetColor" />
+      </linearGradient>
+    </defs>
 
-  <EdgeLabelRenderer>
-    <div
-      :style="{
-        pointerEvents: 'all',
-        position: 'absolute',
-        transform: `translate(-50%, -50%) translate(${path[1]}px,${path[2]}px)`,
-      }"
-      class="nodrag nopan"
-    >
-      <button class="edgebutton" @click="removeEdges(id)">×</button>
-    </div>
-  </EdgeLabelRenderer>
+    <path
+      :d="path"
+      fill="none"
+      stroke-width="2"
+      :stroke="sourceColor === targetColor ? sourceColor : `url(#grad-${props.id})`"
+    />
+  </svg>
 </template>
 
-<style>
-.edgebutton {
-  border-radius: 999px;
-  cursor: pointer;
-}
 
-.edgebutton:hover {
-  box-shadow: 0 0 0 2px pink, 0 0 0 4px #f05f75;
-}
-</style>

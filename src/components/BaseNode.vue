@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { Handle, Position, useVueFlow, HandleConnectableFunc } from '@vue-flow/core'
 import { NodeToolbar } from "@vue-flow/node-toolbar"
+import { HandleDef } from "../types/HandleDef"
 
 const props = defineProps<{
   id: string,
   data: any,
   title: string,
   body?: string,
-  inputs?: string[],
-  outputs?: string[],
+  inputs?: HandleDef[],
+  outputs?: HandleDef[],
   showToolbar?: boolean,
   actions?: string[]
 }>()
@@ -22,7 +23,17 @@ const getHandleTop = (index: number) =>
 
 const { updateNodeData } = useVueFlow()
 
-const handleConnectable: HandleConnectableFunc = () => true
+const { getEdges, removeEdges } = useVueFlow()
+
+function removeHandleEdges(handleId: string) {
+    const edgesToRemove = getEdges.value.filter(
+        (e) => e.sourceHandle === handleId || e.targetHandle === handleId
+    )
+
+    if (edgesToRemove.length) {
+        removeEdges(edgesToRemove)
+    }
+}
 </script>
 
 <template>
@@ -47,33 +58,35 @@ const handleConnectable: HandleConnectableFunc = () => true
         </slot>
     </div>
 
-    <template v-for="(label, index) in outputs ?? []" :key="label">
-      <div class="handle-container right" :style="{ top: `${getHandleTop(index)}px` }">
-        <div class="handle-content">
-          <span class="handle-label">{{ label }}</span>
-          <Handle
-            :id="`source-${label}`"
-            type="source"
-            :position="Position.Right"
-            :style="{ transform: 'translate(50%, -50%)' }"
-          />
+    <template v-for="(handle, index) in outputs ?? []" :key="handle.id">
+        <div class="handle-container right" :style="{ top: `${getHandleTop(index)}px` }">
+            <div class="handle-content">
+            <span class="handle-label">{{ handle.id }}</span>
+            <Handle
+                :id="`source-${handle.id}`"
+                type="source"
+                :position="Position.Right"
+                :style="{ transform: 'translate(50%, -50%)' }"
+                @contextmenu.prevent="removeHandleEdges(`source-${handle.id}`)"
+            />
+            </div>
         </div>
-      </div>
-    </template>
+        </template>
 
-    <template v-for="(label, index) in inputs ?? []" :key="label">
-      <div class="handle-container left" :style="{ top: `${getHandleTop(index)}px` }">
-        <div class="handle-content">
-          <Handle
-            :id="`target-${label}`"
-            type="target"
-            :position="Position.Left"
-            :style="{ transform: 'translate(-50%, -50%)' }"
-          />
-          <span class="handle-label">{{ label }}</span>
+    <template v-for="(handle, index) in inputs ?? []" :key="handle.id">
+        <div class="handle-container left" :style="{ top: `${getHandleTop(index)}px` }">
+            <div class="handle-content">
+            <Handle
+                :id="`target-${handle.id}`"
+                type="target"
+                :position="Position.Left"
+                :style="{ transform: 'translate(-50%, -50%)' }"
+                @contextmenu.prevent="removeHandleEdges(`target-${handle.id}`)"
+            />
+            <span class="handle-label">{{ handle.id }}</span>
+            </div>
         </div>
-      </div>
-    </template>
+        </template>
 
     <div class="spacer" :style="{ height: `${bottomSpacing + Math.max((inputs?.length || 0), (outputs?.length || 0)) * handleSpacing}px` }"></div>
   </div>

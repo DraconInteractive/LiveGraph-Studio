@@ -6,23 +6,30 @@ import { MiniMap } from '@vue-flow/minimap'
 import { VueFlow, useVueFlow, type Node, type Edge, ConnectionMode, Panel } from '@vue-flow/core'
 import { nodeTypes } from './nodes'
 import Icon from './Icon.vue'
+import { colorMap } from './utils/colorMap'
+import type { HandleDef } from "./types/HandleDef"
+import CustomEdge from './CustomEdge.vue'
 
 const { onConnect, addEdges, toObject } = useVueFlow()
 
 // Init graph
 const nodes = ref<Node[]>([
   { id: '2', type: 'run', position: { x: 100, y: 100 } },
-  { id: '3', type: 'custom', position: { x: 100, y: 300 } },
   { id: '4', type: 'debug-log', position: { x: 300, y: 100 } },
 ])
 
 const edges = ref<Edge[]>([
   { 
     id: 'e1->2',
+    type: 'custom',
     source: '2', 
     target: '4',
     sourceHandle: 'source-Exec',
-    targetHandle: 'target-Exec'
+    targetHandle: 'target-Exec',
+    data: {
+      sourceType: 'exec',
+      targetType: 'exec'
+    }
   },
 ])
 
@@ -30,7 +37,35 @@ const showNodeMenu = ref(false)
 const searchQuery = ref('')
 
 onConnect((params) => {
-  addEdges([params])
+  const sourceNode = nodes.value.find(n => n.id === params.source)
+  const targetNode = nodes.value.find(n => n.id === params.target)
+
+  const sourceId = params.sourceHandle?.replace('source-', '')
+  const targetId = params.targetHandle?.replace('target-', '')
+
+  const sourceType = (
+    sourceNode?.data?.outputs as HandleDef[] | undefined
+  )?.find((h) => h.id === sourceId)?.dataType || 'unknown'
+
+  const targetType = (
+    targetNode?.data?.inputs as HandleDef[] | undefined
+  )?.find((h) => h.id === targetId)?.dataType || 'unknown'
+
+  //const sourceColor = colorMap[sourceType as keyof typeof colorMap] || colorMap.unknown
+  //const targetColor = colorMap[targetType as keyof typeof colorMap] || colorMap.unknown
+
+  addEdges(
+    [
+      {
+        ...params,
+        type: 'custom',
+        data: {
+          sourceType,
+          targetType
+        }
+      }
+    ]
+  )
 })
 
 // Filtered node types
@@ -52,18 +87,6 @@ onMounted(() => {
   onUnmounted(() => window.removeEventListener('keydown', listener))
 })
 
-// test
-function addNode() {
-  const id = Date.now().toString()
-  
-  nodes.value.push({
-    id,
-    position: { x: 150, y: 50 },
-    type: "debug-log",
-  })
-}
-
-// for window
 function spawnNode(type: string) {
   const id = Date.now().toString()
 
@@ -160,6 +183,9 @@ function getSanitizedFlow() {
         :key="node.type"
         #[`node-${node.type}`]="nodeProps">
         <component :is="node.component" v-bind="nodeProps" />
+      </template>
+      <template #edge-custom="edgeProps">
+        <CustomEdge v-bind="edgeProps" />
       </template>
     </VueFlow>
   </div>
