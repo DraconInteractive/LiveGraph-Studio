@@ -31,15 +31,36 @@ onConnect((params) => {
 
 const handleSave = (): void => {
   console.log('Save clicked')
-  console.log(JSON.stringify(toObject(), null, 2)) // Pretty-printed JSON
-
+  //console.log(JSON.stringify(toObject(), null, 2)) // Pretty-printed JSON
+  console.log(JSON.stringify(getSanitizedFlow(), null, 2));
 }
 
 const handleRestore = (): void => {
   console.log('Restore clicked')
 }
 
+function getSanitizedFlow() {
+  const full = toObject()
 
+  const sanitized = {
+    nodes: full.nodes.map(({ id, type, data }) => ({
+      id,
+      type,
+      data,
+    })),
+    edges: full.edges.map(({ id, type, source, target, sourceHandle, targetHandle, data }) => ({
+      id,
+      type,
+      source,
+      target,
+      sourceHandle,
+      targetHandle,
+      data,
+    })),
+  }
+
+  return sanitized
+}
 </script>
 
 <template>
