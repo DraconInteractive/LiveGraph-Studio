@@ -3,7 +3,7 @@ import { Handle, Position, useVueFlow, HandleConnectableFunc } from '@vue-flow/c
 import { NodeToolbar } from "@vue-flow/node-toolbar"
 import { HandleDef } from "../types/HandleDef"
 import { colorMap, type DataType } from '../utils/colorMap'
-import { computed } from 'vue';
+import { ref, computed } from 'vue';
 
 const props = defineProps<{
   id: string,
@@ -21,12 +21,16 @@ const titleHeight = 45
 const handleSpacing = 28
 const bottomSpacing = 0
 
+const showDelete = ref(false);
+
 const getHandleTop = (index: number) =>
   titleHeight + index * handleSpacing
 
-const { updateNodeData } = useVueFlow()
+const { updateNodeData, getEdges, removeEdges, removeNodes } = useVueFlow()
 
-const { getEdges, removeEdges } = useVueFlow()
+function deleteNode() {
+  removeNodes([props.id])
+}
 
 function removeHandleEdges(handleId: string) {
     const edgesToRemove = getEdges.value.filter(
@@ -53,7 +57,10 @@ function removeHandleEdges(handleId: string) {
     </button>
   </NodeToolbar>
 
-  <div class="custom-node" :class="data.class">
+  <div class="custom-node" :class="data.class" @mouseenter="showDelete = true" @mouseleave="showDelete = false">
+    <transition name="fade">
+        <button v-if="showDelete" class="delete-button" @click="deleteNode">×</button>
+    </transition>
     <div class="node-title">{{ title }}</div>
     <div style="height: 5px;"></div>
     <div class="node-body">
@@ -119,6 +126,37 @@ function removeHandleEdges(handleId: string) {
   border-radius: 6px;
   color: white;
   font-size: 12px;
+}
+
+.delete-button {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 16px;
+  height: 16px;
+  background-color: #1c1c1c;
+  color: white;
+  border: 1px solid #555;
+  border-radius: 50%;
+  font-size: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+  z-index: 2;
+  transition: background-color 0.2s ease;
+}
+
+.delete-button:hover {
+  background-color: #2a2a2a;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.15s ease;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
 }
 
 .node-title

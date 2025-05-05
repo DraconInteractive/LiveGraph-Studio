@@ -28,6 +28,5 @@ props.data.class = 'debug-log-node'
 
 <style>
 .custom-node.debug-log-node {
-  background-color: red !important;
 }
 </style>
