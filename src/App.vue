@@ -1,16 +1,19 @@
 <script lang="ts" setup>
-import { onMounted, onUnmounted, computed, ref } from 'vue'
+import { onMounted, onUnmounted, computed, ref, watch, nextTick } from 'vue'
 import { Background, BackgroundVariant } from '@vue-flow/background'
 import { Controls, ControlButton } from '@vue-flow/controls'
 import { MiniMap } from '@vue-flow/minimap'
-import { VueFlow, useVueFlow, type Node, type Edge, ConnectionMode, Panel } from '@vue-flow/core'
+import { VueFlow, useVueFlow, type Node, type Edge, ConnectionMode, Panel, VueFlowStore  } from '@vue-flow/core'
 import { nodeTypes } from './nodes'
 import Icon from './Icon.vue'
 import { colorMap } from './utils/colorMap'
 import type { HandleDef } from "./types/HandleDef"
 import CustomEdge from './CustomEdge.vue'
 
-const { onConnect, addEdges, toObject } = useVueFlow()
+const { onConnect, addEdges, toObject, fromObject, setNodes, setEdges, setViewport } = useVueFlow()
+
+const history = ref<any[]>([])
+const historyIndex = ref(-1)
 
 // Init graph
 const nodes = ref<Node[]>([
@@ -35,6 +38,26 @@ const edges = ref<Edge[]>([
 
 const showNodeMenu = ref(false)
 const searchQuery = ref('')
+
+onMounted(() => {
+  // push the initial state into history manually
+  history.value.push(toObject())
+  historyIndex.value = 0
+
+  const listener = (e: KeyboardEvent) => {
+    if (e.shiftKey && e.key.toLowerCase() === 'a') {
+      showNodeMenu.value = true
+    } else if (e.key === 'Escape') {
+      showNodeMenu.value = false
+    } else if (e.ctrlKey && e.key === 'z') {
+      undo()
+    } else if (e.ctrlKey && e.key === 'y') {
+      redo()
+    }
+  }
+  window.addEventListener('keydown', listener)
+  onUnmounted(() => window.removeEventListener('keydown', listener))
+})
 
 onConnect((params) => {
   const sourceNode = nodes.value.find(n => n.id === params.source)
@@ -68,24 +91,27 @@ onConnect((params) => {
   )
 })
 
+watch([nodes, edges], () => {
+  const newSnapshot = toObject()
+  const lastSnapshot = history.value[historyIndex.value]
+
+  // Only push if something actually changed
+  if (JSON.stringify(newSnapshot) !== JSON.stringify(lastSnapshot)) {
+    if (historyIndex.value < history.value.length - 1) {
+      history.value.splice(historyIndex.value + 1)
+    }
+
+    history.value.push(newSnapshot)
+    historyIndex.value = history.value.length - 1
+  }
+}, { deep: true })
+
 // Filtered node types
 const filteredNodeTypes = computed(() =>
   nodeTypes.filter((n) =>
     n.type.toLowerCase().includes(searchQuery.value.toLowerCase())
   )
 )
-
-onMounted(() => {
-  const listener = (e: KeyboardEvent) => {
-    if (e.shiftKey && e.key.toLowerCase() === 'a') {
-      showNodeMenu.value = true
-    } else if (e.key === 'Escape') {
-      showNodeMenu.value = false
-    }
-  }
-  window.addEventListener('keydown', listener)
-  onUnmounted(() => window.removeEventListener('keydown', listener))
-})
 
 function spawnNode(type: string) {
   const id = Date.now().toString()
@@ -109,6 +135,34 @@ const handleSave = (): void => {
 
 const handleRestore = (): void => {
   console.log('Restore clicked')
+}
+
+function undo() {
+  if (historyIndex.value > 0) {
+    historyIndex.value--
+
+    const snapshot = history.value[historyIndex.value]
+    const currentViewport = toObject().viewport
+
+    fromObject({
+      ...snapshot,
+      viewport: currentViewport, // preserve current zoom/pan
+    })
+  }
+}
+
+function redo() {
+  if (historyIndex.value < history.value.length - 1) {
+    historyIndex.value++
+
+    const snapshot = history.value[historyIndex.value]
+    const currentViewport = toObject().viewport
+
+    fromObject({
+      ...snapshot,
+      viewport: currentViewport, // preserve current zoom/pan
+    })
+  }
 }
 
 function getSanitizedFlow() {
@@ -162,6 +216,7 @@ function getSanitizedFlow() {
 </div>
   <div style="height: 100vh" class="dark">
     <VueFlow
+      ref="vueFlowRef"
       v-model:nodes="nodes"
       v-model:edges="edges"
       fit-view-on-init
