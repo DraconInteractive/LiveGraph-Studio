@@ -12,7 +12,7 @@ const outputs: HandleDef[] = [
 
 props.data.inputs = inputs
 props.data.outputs = outputs
-
+props.data.class = 'entry-node'
 </script>
 
 <template>
@@ -24,3 +24,13 @@ props.data.outputs = outputs
         :outputs="outputs"
     />
 </template>
+
+<style>
+.custom-node.entry-node {
+  background-color: green !important;
+  min-width: 75px;
+  padding-left: 0px;
+  padding-right: 0px;
+  padding-bottom: 0px;
+}
+</style>

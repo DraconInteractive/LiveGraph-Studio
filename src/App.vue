@@ -114,20 +114,26 @@ const handleRestore = (): void => {
 function getSanitizedFlow() {
   const full = toObject()
 
+  const sanitizeHandle = (handle?: string | null | undefined) =>
+    handle?.replace(/^source-/, '').replace(/^target-/, '') || undefined
+
+  const stripInternalData = (data: Record<string, any> = {}) => {
+    const { inputs, outputs, ...rest } = data
+    return rest
+  }
+
   const sanitized = {
     nodes: full.nodes.map(({ id, type, data }) => ({
       id,
       type,
-      data,
+      data: stripInternalData(data)
     })),
-    edges: full.edges.map(({ id, type, source, target, sourceHandle, targetHandle, data }) => ({
+    edges: full.edges.map(({ id, source, target, sourceHandle, targetHandle }) => ({
       id,
-      type,
       source,
       target,
-      sourceHandle,
-      targetHandle,
-      data,
+      sourceHandle: sanitizeHandle(sourceHandle),
+      targetHandle: sanitizeHandle(targetHandle),
     })),
   }
 

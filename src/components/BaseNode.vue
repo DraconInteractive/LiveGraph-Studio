@@ -2,6 +2,8 @@
 import { Handle, Position, useVueFlow, HandleConnectableFunc } from '@vue-flow/core'
 import { NodeToolbar } from "@vue-flow/node-toolbar"
 import { HandleDef } from "../types/HandleDef"
+import { colorMap, type DataType } from '../utils/colorMap'
+import { computed } from 'vue';
 
 const props = defineProps<{
   id: string,
@@ -11,7 +13,8 @@ const props = defineProps<{
   inputs?: HandleDef[],
   outputs?: HandleDef[],
   showToolbar?: boolean,
-  actions?: string[]
+  actions?: string[],
+  customClass?: string
 }>()
 
 const titleHeight = 45
@@ -34,6 +37,7 @@ function removeHandleEdges(handleId: string) {
         removeEdges(edgesToRemove)
     }
 }
+
 </script>
 
 <template>
@@ -49,7 +53,7 @@ function removeHandleEdges(handleId: string) {
     </button>
   </NodeToolbar>
 
-  <div class="custom-node">
+  <div class="custom-node" :class="data.class">
     <div class="node-title">{{ title }}</div>
     <div style="height: 5px;"></div>
     <div class="node-body">
@@ -66,7 +70,10 @@ function removeHandleEdges(handleId: string) {
                 :id="`source-${handle.id}`"
                 type="source"
                 :position="Position.Right"
-                :style="{ transform: 'translate(50%, -50%)' }"
+                :style="{ 
+                    transform: 'translate(50%, -50%)', 
+                    borderColor: colorMap[handle.dataType as DataType] || colorMap.unknown, 
+                }"
                 @contextmenu.prevent="removeHandleEdges(`source-${handle.id}`)"
             />
             </div>
@@ -80,7 +87,10 @@ function removeHandleEdges(handleId: string) {
                 :id="`target-${handle.id}`"
                 type="target"
                 :position="Position.Left"
-                :style="{ transform: 'translate(-50%, -50%)' }"
+                :style="{ 
+                    transform: 'translate(-50%, -50%)', 
+                    borderColor: colorMap[handle.dataType as DataType] || colorMap.unknown, 
+                }"
                 @contextmenu.prevent="removeHandleEdges(`target-${handle.id}`)"
             />
             <span class="handle-label">{{ handle.id }}</span>
@@ -92,7 +102,13 @@ function removeHandleEdges(handleId: string) {
   </div>
 </template>
 
+<style>
+
+</style>
+
 <style scoped>
+/* Core */
+
 .custom-node {
   position: relative;
   padding: 10px;
@@ -118,6 +134,7 @@ function removeHandleEdges(handleId: string) {
   white-space: pre-line;
 }
 
+/* Handles */
 .handle-container {
   position: absolute;
   transform: translateY(-50%);
@@ -157,6 +174,7 @@ function removeHandleEdges(handleId: string) {
   margin: 0 6px;
 }
 
+/* Toolbar */
 .vue-flow__node-toolbar {
   display: flex;
   gap: 0.5rem;

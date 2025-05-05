@@ -13,7 +13,7 @@ const outputs = [
 
 props.data.inputs = inputs
 props.data.outputs = outputs
-
+props.data.class = 'debug-log-node'
 </script>
 
 <template>
@@ -22,6 +22,12 @@ props.data.outputs = outputs
         :data="props.data"
         title="Debug Log"
         :inputs="inputs"
-        :outputs="outputs"
+        :outputs="outputs",
     />
 </template>
+
+<style>
+.custom-node.debug-log-node {
+  background-color: red !important;
+}
+</style>
