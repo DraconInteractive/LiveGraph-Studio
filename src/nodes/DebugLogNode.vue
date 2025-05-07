@@ -8,7 +8,8 @@ const inputs = [
   { id: 'Message', dataType: 'string' }
 ]
 const outputs = [
-  { id: 'Exec', dataType: 'exec' }
+  { id: 'Exec', dataType: 'exec' },
+  { id: 'String', dataType: 'string'}
 ]
 
 props.data.inputs = inputs
@@ -23,7 +24,11 @@ props.data.class = 'debug-log-node'
         title="Debug Log"
         :inputs="inputs"
         :outputs="outputs",
-    />
+    >
+        <template #output-String>
+            <StringHandle :id="'String'" :node-id="props.id" />
+        </template>
+    </BaseNode>
 </template>
 
 <style>

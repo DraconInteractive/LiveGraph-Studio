@@ -41,7 +41,6 @@ function removeHandleEdges(handleId: string) {
         removeEdges(edgesToRemove)
     }
 }
-
 </script>
 
 <template>
@@ -72,21 +71,22 @@ function removeHandleEdges(handleId: string) {
     <template v-for="(handle, index) in outputs ?? []" :key="handle.id">
         <div class="handle-container right" :style="{ top: `${getHandleTop(index)}px` }">
             <div class="handle-content">
-                <!-- Output handle slot (optional content) -->
-                <slot :name="`output-${handle.id}`" :handle="handle" />
+                <template v-if="!getEdges.some(e => e.source === id && e.sourceHandle === `source-${handle.id}`)">
+                    <slot :name="`output-${handle.id}`" :handle="handle" />
+                </template>
 
-                <span class="handle-label">{{ handle.id }}</span>
-                
-                <Handle
-                    :id="`source-${handle.id}`"
-                    type="source"
-                    :position="Position.Right"
-                    :style="{ 
-                    transform: 'translate(50%, -50%)', 
-                    borderColor: colorMap[handle.dataType as DataType] || colorMap.unknown 
-                    }"
-                    @contextmenu.prevent="removeHandleEdges(`source-${handle.id}`)"
-                />
+            <span class="handle-label">{{ handle.id }}</span>
+
+            <Handle
+                :id="`source-${handle.id}`"
+                type="source"
+                :position="Position.Right"
+                :style="{
+                transform: 'translate(50%, -50%)',
+                borderColor: colorMap[handle.dataType as DataType] || colorMap.unknown,
+                }"
+                @contextmenu.prevent="removeHandleEdges(`source-${handle.id}`)"
+            />
             </div>
         </div>
     </template>
