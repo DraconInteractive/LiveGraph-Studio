@@ -72,20 +72,24 @@ function removeHandleEdges(handleId: string) {
     <template v-for="(handle, index) in outputs ?? []" :key="handle.id">
         <div class="handle-container right" :style="{ top: `${getHandleTop(index)}px` }">
             <div class="handle-content">
-            <span class="handle-label">{{ handle.id }}</span>
-            <Handle
-                :id="`source-${handle.id}`"
-                type="source"
-                :position="Position.Right"
-                :style="{ 
+                <!-- Output handle slot (optional content) -->
+                <slot :name="`output-${handle.id}`" :handle="handle" />
+
+                <span class="handle-label">{{ handle.id }}</span>
+                
+                <Handle
+                    :id="`source-${handle.id}`"
+                    type="source"
+                    :position="Position.Right"
+                    :style="{ 
                     transform: 'translate(50%, -50%)', 
-                    borderColor: colorMap[handle.dataType as DataType] || colorMap.unknown, 
-                }"
-                @contextmenu.prevent="removeHandleEdges(`source-${handle.id}`)"
-            />
+                    borderColor: colorMap[handle.dataType as DataType] || colorMap.unknown 
+                    }"
+                    @contextmenu.prevent="removeHandleEdges(`source-${handle.id}`)"
+                />
             </div>
         </div>
-        </template>
+    </template>
 
     <template v-for="(handle, index) in inputs ?? []" :key="handle.id">
         <div class="handle-container left" :style="{ top: `${getHandleTop(index)}px` }">

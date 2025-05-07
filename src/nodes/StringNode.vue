@@ -5,13 +5,17 @@ import { ref, computed, watch } from 'vue'
 import { useVueFlow } from '@vue-flow/core'
 
 const props = defineProps(['id', 'data'])
-const { updateNodeData } = useVueFlow()
+const { updateNodeData, getEdges } = useVueFlow()
 
 const inputs: HandleDef[] = []
 
 const outputs = [
   { id: 'String', dataType: 'string' }
 ]
+
+const isUnconnected = computed(() =>
+  !getEdges.value.some(e => e.sourceHandle === 'source-String')
+)
 
 props.data.inputs = inputs
 props.data.outputs = outputs
@@ -31,24 +35,23 @@ watch(localValue, (val) => {
 </script>
 
 <template>
-    <BaseNode
-        :id="props.id"
-        :data="props.data"
-        title="String"
-        :inputs="inputs"
-        :outputs="outputs"
-    >
-        <template #body>
-            <div style="display: flex; justify-content: flex-start; width: 100%;">
-                <input
-                v-model="localValue"
-                type="text"
-                placeholder="Enter string..."
-                style="font-size: 4px; padding: 2px; text-align: left; width: 50px"
-                />
-            </div>
-        </template>
-    </BaseNode>
+  <BaseNode
+    :id="props.id"
+    :data="props.data"
+    title="String"
+    :inputs="inputs"
+    :outputs="outputs"
+  >
+    <template #output-String="{ handle }">
+      <input
+        v-if="isUnconnected"
+        v-model="localValue"
+        type="text"
+        placeholder="Enter string..."
+        style="font-size: 6px; padding: 2px; width: 60px; margin: 0 4px;"
+      />
+    </template>
+  </BaseNode>
 </template>
 
 
