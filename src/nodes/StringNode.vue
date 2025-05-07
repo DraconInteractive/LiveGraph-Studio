@@ -1,18 +1,36 @@
 <script setup lang="ts">
 import BaseNode from '../components/BaseNode.vue'
 import { HandleDef } from '~/types/HandleDef'
-import StringHandle from "../components/StringHandle.vue"
+import { ref, computed, watch } from 'vue'
+import { useVueFlow } from '@vue-flow/core'
 
 const props = defineProps(['id', 'data'])
+const { updateNodeData, getEdges } = useVueFlow()
 
 const inputs: HandleDef[] = []
+
 const outputs = [
   { id: 'String', dataType: 'string' }
 ]
 
+const isUnconnected = computed(() =>
+  !getEdges.value.some(e => e.sourceHandle === 'source-String')
+)
+
 props.data.inputs = inputs
 props.data.outputs = outputs
 props.data.class = 'string-node'
+// Local value (two-way binding with input)
+const localValue = computed({
+  get: () => props.data.value,
+  set: (val: string) => {
+    props.data.value = val
+  }
+})
+// Keep node data in sync when local input changes
+watch(localValue, (val) => {
+  updateNodeData(props.id, { value: val })
+})
 
 </script>
 
@@ -24,8 +42,14 @@ props.data.class = 'string-node'
     :inputs="inputs"
     :outputs="outputs"
   >
-    <template #output-String>
-        <StringHandle :id="'String'" :node-id="props.id" />
+    <template #output-String="{ handle }">
+      <input
+        v-if="isUnconnected"
+        v-model="localValue"
+        type="text"
+        placeholder="Enter string..."
+        style="font-size: 6px; padding: 2px; width: 60px; margin: 0 4px;"
+      />
     </template>
   </BaseNode>
 </template>
