@@ -36,15 +36,52 @@ const edges = ref<Edge[]>([
   },
 ])
 
+// Node menu
 const showNodeMenu = ref(false)
 const searchQuery = ref('')
+const currentCategory = ref<string | null>(null)
 
+const categorizedNodeTypes = computed(() => {
+  if (searchQuery.value.trim()) {
+    const results = nodeTypes
+      .filter(n =>
+        n.type.toLowerCase().includes(searchQuery.value.toLowerCase())
+      )
+      .map(n => ({ ...n, isCategory: false }))
+    console.log('Search results:', results)
+    return results
+  }
+
+  if (!currentCategory.value) {
+    const categories = [...new Set(nodeTypes.map(n => n.category).filter(Boolean))]
+    const result = categories.map(c => ({ type: c, isCategory: true }))
+    console.log('Category listing:', result)
+    return result
+  }
+
+  const filtered = nodeTypes
+    .filter(n => n.category === currentCategory.value)
+    .map(n => ({ ...n, isCategory: false }))
+  console.log('Category view:', filtered)
+  return filtered
+})
+
+// Events
 onMounted(() => {
+
+  handleRestore()
+
   // push the initial state into history manually
   history.value.push(toObject())
   historyIndex.value = 0
 
   const listener = (e: KeyboardEvent) => {
+    if (e.ctrlKey && e.key.toLowerCase() === 's') {
+      e.preventDefault()
+      handleSave()
+      return
+    }
+
     if (e.shiftKey && e.key.toLowerCase() === 'a') {
       showNodeMenu.value = true
     } else if (e.key === 'Escape') {
@@ -106,13 +143,6 @@ watch([nodes, edges], () => {
   }
 }, { deep: true })
 
-// Filtered node types
-const filteredNodeTypes = computed(() =>
-  nodeTypes.filter((n) =>
-    n.type.toLowerCase().includes(searchQuery.value.toLowerCase())
-  )
-)
-
 function spawnNode(type: string) {
   const id = Date.now().toString()
 
@@ -125,18 +155,46 @@ function spawnNode(type: string) {
 
   showNodeMenu.value = false
   searchQuery.value = ''
+
+  showToast("Spawned " + type);
 }
 
-const handleSave = (): void => {
-  console.log('Save clicked')
-  //console.log(JSON.stringify(toObject(), null, 2)) // Pretty-printed JSON
-  console.log(JSON.stringify(getSanitizedFlow(), null, 2));
+// Persistence
+const handleSave = async (): Promise<void> => {
+  const flowData = toObject();
+  const serialized = JSON.stringify(getSanitizedFlow(), null, 2);
+
+  localStorage.setItem('last-saved-graph', JSON.stringify(flowData));
+
+  try {
+    await navigator.clipboard.writeText(serialized)
+    showToast("Saved!")
+  } catch (err) {
+    console.error("Failed to copy to clipboard:", err)
+    showToast("Saved, but failed to export", 3000)
+  }
 }
 
 const handleRestore = (): void => {
-  console.log('Restore clicked')
+  const saved = localStorage.getItem('last-saved-graph');
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved)
+      fromObject(parsed)
+      console.log('Flow restored from localStorage.')
+      showToast("Loaded!")
+    } catch (e) {
+      console.error('Failed to load flow from localStorage:', e)
+      showToast("Failed to load!", 3000)
+
+    }
+  } else {
+    console.log('No saved flow found.')
+    showToast("No saved flow found.", 3000)
+  }
 }
 
+// History
 function undo() {
   if (historyIndex.value > 0) {
     historyIndex.value--
@@ -148,6 +206,7 @@ function undo() {
       ...snapshot,
       viewport: currentViewport, // preserve current zoom/pan
     })
+    showToast("Undone!")
   }
 }
 
@@ -162,9 +221,11 @@ function redo() {
       ...snapshot,
       viewport: currentViewport, // preserve current zoom/pan
     })
+    showToast("Redone!")
   }
 }
 
+// Export
 function getSanitizedFlow() {
   const full = toObject()
 
@@ -193,27 +254,45 @@ function getSanitizedFlow() {
 
   return sanitized
 }
+
+// Toast
+const toasts = ref<{ id: number, message: string }[]>([])
+
+function showToast(message: string, duration = 2000) {
+  const id = Date.now() + Math.random() // unique ID
+  toasts.value.push({ id, message })
+
+  setTimeout(() => {
+    toasts.value = toasts.value.filter(toast => toast.id !== id)
+  }, duration)
+}
+
+
 </script>
 
 <template>
   <div v-if="showNodeMenu" class="node-menu">
-  <input
-    type="text"
-    placeholder="Search nodes..."
-    v-model="searchQuery"
-    class="node-search"
-    autofocus
-  />
-  <ul class="node-list">
-    <li
-      v-for="node in filteredNodeTypes"
-      :key="node.type"
-      @click="spawnNode(node.type)"
-    >
-      {{ node.type }}
-    </li>
-  </ul>
+    <input
+      type="text"
+      placeholder="Search nodes..."
+      v-model="searchQuery"
+      class="node-search"
+      autofocus
+    />
+    <ul class="node-list">
+      <li
+        v-for="item in categorizedNodeTypes"
+        :key="item.type"
+        @click="item.isCategory ? currentCategory = item.type : spawnNode(item.type)"
+      >
+        {{ item.isCategory ? `📁 ${item.type}` : item.type }}
+      </li>
+    </ul>
+
+<div v-if="currentCategory && !searchQuery" style="margin-top: 8px;">
+  <button @click="currentCategory = null">← Return</button>
 </div>
+  </div>
   <div style="height: 100vh" class="dark">
     <VueFlow
       ref="vueFlowRef"
@@ -250,6 +329,11 @@ function getSanitizedFlow() {
       </template>
     </VueFlow>
   </div>
+  <transition-group name="toast-fade" tag="div" class="toast-container">
+    <div v-for="toast in toasts" :key="toast.id" class="toast">
+      {{ toast.message }}
+    </div>
+  </transition-group>
 </template>
 
 <style>
@@ -304,6 +388,39 @@ function getSanitizedFlow() {
 
 .node-list li:hover {
   background: #3a3a3a;
+}
+
+.toast-container {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 9999;
+}
+
+.toast {
+  background: #333;
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  opacity: 1;
+  transition: opacity 0.4s, transform 0.4s;
+}
+
+/* Fade in */
+.toast-fade-enter-from,
+.toast-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.toast-fade-enter-active,
+.toast-fade-leave-active {
+  transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
 </style>
