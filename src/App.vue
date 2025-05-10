@@ -44,7 +44,7 @@ const categorizedNodeTypes = computed(() => {
   if (searchQuery.value.trim()) {
     const results = nodeTypes
       .filter(n =>
-        n.type.toLowerCase().includes(searchQuery.value.toLowerCase())
+        n.display.toLowerCase().includes(searchQuery.value.toLowerCase())
       )
       .map(n => ({ ...n, isCategory: false }))
     console.log('Search results:', results)
@@ -53,7 +53,7 @@ const categorizedNodeTypes = computed(() => {
 
   if (!currentCategory.value) {
     const categories = [...new Set(nodeTypes.map(n => n.category).filter(Boolean))]
-    const result = categories.map(c => ({ type: c, isCategory: true }))
+    const result = categories.map(c => ({ type: c, isCategory: true, display: c }))
     console.log('Category listing:', result)
     return result
   }
@@ -109,9 +109,6 @@ onConnect((params) => {
   const targetType = (
     targetNode?.data?.inputs as HandleDef[] | undefined
   )?.find((h) => h.id === targetId)?.dataType || 'unknown'
-
-  //const sourceColor = colorMap[sourceType as keyof typeof colorMap] || colorMap.unknown
-  //const targetColor = colorMap[targetType as keyof typeof colorMap] || colorMap.unknown
 
   addEdges(
     [
@@ -281,16 +278,16 @@ function showToast(message: string, duration = 2000) {
     <ul class="node-list">
       <li
         v-for="item in categorizedNodeTypes"
-        :key="item.type"
+        :key="item.display"
         @click="item.isCategory ? currentCategory = item.type : spawnNode(item.type)"
       >
-        {{ item.isCategory ? `📁 ${item.type}` : item.type }}
+        {{ item.isCategory ? `📁 ${item.type}` : item.display }}
       </li>
     </ul>
 
-<div v-if="currentCategory && !searchQuery" style="margin-top: 8px;">
-  <button @click="currentCategory = null">← Return</button>
-</div>
+    <div v-if="currentCategory && !searchQuery" style="margin-top: 8px;">
+      <button @click="currentCategory = null">← Return</button>
+    </div>
   </div>
   <div style="height: 100vh" class="dark">
     <VueFlow
