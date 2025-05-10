@@ -14,6 +14,8 @@ const { onConnect, addEdges, toObject, fromObject } = useVueFlow()
 const history = ref<any[]>([])
 const historyIndex = ref(-1)
 
+const nodeSearchInputRef = ref<HTMLInputElement | null>(null)
+
 // Init graph
 const nodes = ref<Node[]>([
   { id: '2', type: 'run', position: { x: 100, y: 100 } },
@@ -82,14 +84,28 @@ onMounted(() => {
     }
 
     if (e.shiftKey && e.key.toLowerCase() === 'a') {
+      e.preventDefault()
       showNodeMenu.value = true
+      searchQuery.value = ''
+      nextTick(() => {
+        nodeSearchInputRef.value?.focus()
+      })
     } else if (e.key === 'Escape') {
+      showNodeMenu.value = false
+    } else if (showNodeMenu && e.key === 'Enter') {
+      const menuNodes = categorizedNodeTypes
+      if (menuNodes.value.length > 0)
+      {
+        console.log(JSON.stringify(menuNodes.value[0], null, 2))
+        spawnNode(menuNodes.value[0].type)
+      }
       showNodeMenu.value = false
     } else if (e.ctrlKey && e.key === 'z') {
       undo()
     } else if (e.ctrlKey && e.key === 'y') {
       redo()
     }
+
   }
   window.addEventListener('keydown', listener)
   onUnmounted(() => window.removeEventListener('keydown', listener))
@@ -274,6 +290,7 @@ function showToast(message: string, duration = 2000) {
       v-model="searchQuery"
       class="node-search"
       autofocus
+      ref="nodeSearchInputRef"
     />
     <ul class="node-list">
       <li
