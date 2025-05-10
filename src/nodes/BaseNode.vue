@@ -124,8 +124,15 @@ function removeHandleEdges(handleId: string) {
         </div>
       </div>
     </template>
-
-    <div v-if="renderSpacer" class="spacer" :style="{ height: `${bottomSpacing + Math.max((inputs?.length || 0), (outputs?.length || 0)) * handleSpacing}px` }"></div>
+    <div
+      v-if="renderSpacer"
+      class="spacer"
+      :style="{
+        height: `${bottomSpacing > 0
+          ? bottomSpacing
+          : Math.max((inputs?.length || 0), (outputs?.length || 0)) * handleSpacing}px`
+      }"
+    ></div>
   </div>
 </template>
 
