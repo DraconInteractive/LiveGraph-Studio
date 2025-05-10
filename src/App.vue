@@ -6,11 +6,10 @@ import { MiniMap } from '@vue-flow/minimap'
 import { VueFlow, useVueFlow, type Node, type Edge, ConnectionMode, Panel, VueFlowStore  } from '@vue-flow/core'
 import { nodeTypes } from './nodes'
 import Icon from './Icon.vue'
-import { colorMap } from './utils/colorMap'
 import type { HandleDef } from "./types/HandleDef"
 import CustomEdge from './CustomEdge.vue'
 
-const { onConnect, addEdges, toObject, fromObject, setNodes, setEdges, setViewport } = useVueFlow()
+const { onConnect, addEdges, toObject, fromObject } = useVueFlow()
 
 const history = ref<any[]>([])
 const historyIndex = ref(-1)

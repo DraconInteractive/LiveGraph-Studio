@@ -7,12 +7,12 @@ import StringNode from './Core/Data/StringNode.vue'
 import ToStringNode from './Core/Data/ToStringNode.vue'
 
 export const nodeTypes = [
-    { type: 'debug-log', component: DebugLogNode, category: 'Debug' },
-    { type: 'run', component: EntryNode, category: 'Control' },
-    { type: 'string-literal', component: StringNode, category: 'Data' },
-    { type: 'int-literal', component: IntNode, category: 'Data' },
-    { type: 'to-string-node', component: ToStringNode, category: 'Data'},
-    { type: 'find-sentient-name-node', component: FindSentientByNameNode, category: 'Data'},
-    { type: 'find-sentient-id-node', component: FindSentientByIDNode, category: 'Data'},
+    { type: 'debug-log', component: DebugLogNode, category: 'Debug', display: 'Debug Log' },
+    { type: 'run', component: EntryNode, category: 'Control', display: 'Entry' },
+    { type: 'string-literal', component: StringNode, category: 'Data', display: 'String' },
+    { type: 'int-literal', component: IntNode, category: 'Data', display: 'Int' },
+    { type: 'to-string-node', component: ToStringNode, category: 'Data', display: 'To String'},
+    { type: 'find-sentient-name-node', component: FindSentientByNameNode, category: 'Data', display: 'Find Sentient by Name'},
+    { type: 'find-sentient-id-node', component: FindSentientByIDNode, category: 'Data', display: 'Find Sentient by ID'},
   ]
 

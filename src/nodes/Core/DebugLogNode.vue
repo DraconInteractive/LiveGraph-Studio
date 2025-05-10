@@ -31,5 +31,6 @@ props.data.class = 'debug-log-node'
 
 <style>
 .custom-node.debug-log-node {
+  min-width: 50px;
 }
 </style>
