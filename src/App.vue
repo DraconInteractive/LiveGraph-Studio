@@ -3,19 +3,21 @@ import { onMounted, onUnmounted, computed, ref, watch, nextTick } from 'vue'
 import { Background, BackgroundVariant } from '@vue-flow/background'
 import { Controls, ControlButton } from '@vue-flow/controls'
 import { MiniMap } from '@vue-flow/minimap'
-import { VueFlow, useVueFlow, type Node, type Edge, ConnectionMode, Panel, VueFlowStore  } from '@vue-flow/core'
+import { VueFlow, useVueFlow, type Node, type Edge, ConnectionMode, Panel, VueFlowStore, OnConnectStartParams  } from '@vue-flow/core'
 import { nodeTypes } from './nodes'
 import Icon from './Icon.vue'
 import type { HandleDef } from "./types/HandleDef"
 import CustomEdge from './CustomEdge.vue'
 
-const { onConnect, addEdges, toObject, fromObject } = useVueFlow()
+const { onConnect, addEdges, toObject, fromObject, onConnectStart, onConnectEnd } = useVueFlow()
 
 const history = ref<any[]>([])
 const historyIndex = ref(-1)
 
 const nodeSearchInputRef = ref<HTMLInputElement | null>(null)
 
+const isValidConnnection = ref(false);
+const connStartParams = ref<OnConnectStartParams>();
 // Init graph
 const nodes = ref<Node[]>([
   { id: '2', type: 'run', position: { x: 100, y: 100 } },
@@ -67,6 +69,19 @@ const categorizedNodeTypes = computed(() => {
   return filtered
 })
 
+function openNodeMenu () {
+  showNodeMenu.value = true
+  searchQuery.value = ''
+  nextTick(() => {
+    nodeSearchInputRef.value?.focus()
+  })
+}
+
+function spawnMenuNode (type: string, params?: OnConnectStartParams)
+{
+  spawnNode(type)
+}
+
 // Events
 onMounted(() => {
 
@@ -85,19 +100,14 @@ onMounted(() => {
 
     if (e.shiftKey && e.key.toLowerCase() === 'a') {
       e.preventDefault()
-      showNodeMenu.value = true
-      searchQuery.value = ''
-      nextTick(() => {
-        nodeSearchInputRef.value?.focus()
-      })
+      openNodeMenu()
     } else if (e.key === 'Escape') {
       showNodeMenu.value = false
     } else if (showNodeMenu && e.key === 'Enter') {
       const menuNodes = categorizedNodeTypes
       if (menuNodes.value.length > 0)
       {
-        console.log(JSON.stringify(menuNodes.value[0], null, 2))
-        spawnNode(menuNodes.value[0].type)
+        spawnMenuNode(menuNodes.value[0].type)
       }
       showNodeMenu.value = false
     } else if (e.ctrlKey && e.key === 'z') {
@@ -111,7 +121,23 @@ onMounted(() => {
   onUnmounted(() => window.removeEventListener('keydown', listener))
 })
 
+onConnectStart((params) => {
+  isValidConnnection.value = false
+  connStartParams.value = params
+  console.log(JSON.stringify(params, null, 2))
+}) 
+
+onConnectEnd(() => {
+  if (!isValidConnnection.value)
+  {
+    openNodeMenu()
+    // needs better logic to add connection
+  }
+})
+
 onConnect((params) => {
+  isValidConnnection.value = true;
+
   const sourceNode = nodes.value.find(n => n.id === params.source)
   const targetNode = nodes.value.find(n => n.id === params.target)
 
