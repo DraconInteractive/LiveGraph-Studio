@@ -1,4 +1,4 @@
-export type DataType = 'string' | 'int' | 'bool' | 'customType' | 'unknown' | 'exec'
+export type DataType = 'string' | 'int' | 'bool' | 'customType' | 'unknown' | 'exec' | 'sentient'
 
 export const colorMap: Record<DataType, string> = {
   string: 'hotpink',
@@ -6,5 +6,6 @@ export const colorMap: Record<DataType, string> = {
   bool: 'orange',
   customType: 'lime',
   unknown: 'gray',
-  exec: 'white'
+  exec: 'white',
+  sentient: 'purple',
 }

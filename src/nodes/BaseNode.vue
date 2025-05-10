@@ -14,17 +14,29 @@ const props = defineProps<{
   outputs?: HandleDef[],
   showToolbar?: boolean,
   actions?: string[],
-  customClass?: string
+  customClass?: string,
+  handleSpacing?: number, // New prop
+  bottomSpacing?: number,  // New prop,
+  titleSpacing?: number,
+  titleFontSize?: number,
+  renderTitle?: boolean,
+  renderBody?: boolean,
+  renderSpacer?: boolean,
 }>()
 
-const titleHeight = 45
-const handleSpacing = 28
-const bottomSpacing = 0
+const titleSpacing = props.titleSpacing ?? 45
+const titleFontSize = props.titleFontSize ?? 8
+const handleSpacing = props.handleSpacing ?? 28 // Default to 28 if not provided
+const bottomSpacing = props.bottomSpacing ?? 0  // Default to 0 if not provided
+
+const renderTitle = props.renderTitle ?? true
+const renderBody = props.renderBody ?? true
+const renderSpacer = props.renderSpacer ?? true
 
 const showDelete = ref(false);
 
 const getHandleTop = (index: number) =>
-  titleHeight + index * handleSpacing
+titleSpacing + index * handleSpacing
 
 const { updateNodeData, getEdges, removeEdges, removeNodes } = useVueFlow()
 
@@ -57,55 +69,63 @@ function removeHandleEdges(handleId: string) {
     </button>
   </NodeToolbar>
 
+  <!--<div>{{ renderTitle }} || {{ renderBody }} || {{ renderSpacer }}</div>-->
   <div class="custom-node" :class="data.class" @mouseenter="showDelete = true" @mouseleave="showDelete = false">
     <transition name="fade">
-        <button v-if="showDelete" class="delete-button" @click="deleteNode">×</button>
+      <button v-if="showDelete" class="delete-button" @click="deleteNode">×</button>
     </transition>
-    <div class="node-title">{{ title }}</div>
-    <div style="height: 5px;"></div>
-    <div class="node-body">
-        <slot name="body">
-            {{ body }}
-        </slot>
+    <div v-if="renderTitle" :style="{ fontSize: `${titleFontSize}px` }">{{ title }}</div>    <div style="height: 5px;"></div>
+    <div v-if="renderBody" class="node-body">
+      <slot name="body">
+        {{ body }}
+      </slot>
     </div>
 
+    <!-- Outputs -->
     <template v-for="(handle, index) in outputs ?? []" :key="handle.id">
-        <div class="handle-container right" :style="{ top: `${getHandleTop(index)}px` }">
-            <div class="handle-content">
+      <div class="handle-container right" :style="{ top: `${getHandleTop(index)}px` }">
+        <div class="handle-content">
+          <slot :name="`output-${handle.id}`" :handle="handle">
+            <!-- Default handle rendering -->
             <span class="handle-label">{{ handle.id }}</span>
             <Handle
-                :id="`source-${handle.id}`"
-                type="source"
-                :position="Position.Right"
-                :style="{ 
-                    transform: 'translate(50%, -50%)', 
-                    borderColor: colorMap[handle.dataType as DataType] || colorMap.unknown, 
-                }"
-                @contextmenu.prevent="removeHandleEdges(`source-${handle.id}`)"
+              :id="`source-${handle.id}`"
+              type="source"
+              :position="Position.Right"
+              :style="{ 
+                transform: 'translate(50%, -50%)', 
+                borderColor: colorMap[handle.dataType as DataType] || colorMap.unknown, 
+              }"
+              @contextmenu.prevent="removeHandleEdges(`source-${handle.id}`)"
             />
-            </div>
+          </slot>
         </div>
-        </template>
+      </div>
+    </template>
 
+    <!-- Inputs -->
     <template v-for="(handle, index) in inputs ?? []" :key="handle.id">
-        <div class="handle-container left" :style="{ top: `${getHandleTop(index)}px` }">
-            <div class="handle-content">
+      <div class="handle-container left" :style="{ top: `${getHandleTop(index)}px` }">
+        <div class="handle-content">
+          <slot :name="`input-${handle.id}`" :handle="handle">
+            <!-- Default handle rendering -->
             <Handle
-                :id="`target-${handle.id}`"
-                type="target"
-                :position="Position.Left"
-                :style="{ 
-                    transform: 'translate(-50%, -50%)', 
-                    borderColor: colorMap[handle.dataType as DataType] || colorMap.unknown, 
-                }"
-                @contextmenu.prevent="removeHandleEdges(`target-${handle.id}`)"
+              :id="`target-${handle.id}`"
+              type="target"
+              :position="Position.Left"
+              :style="{ 
+                transform: 'translate(-50%, -50%)', 
+                borderColor: colorMap[handle.dataType as DataType] || colorMap.unknown, 
+              }"
+              @contextmenu.prevent="removeHandleEdges(`target-${handle.id}`)"
             />
             <span class="handle-label">{{ handle.id }}</span>
-            </div>
+          </slot>
         </div>
-        </template>
+      </div>
+    </template>
 
-    <div class="spacer" :style="{ height: `${bottomSpacing + Math.max((inputs?.length || 0), (outputs?.length || 0)) * handleSpacing}px` }"></div>
+    <div v-if="renderSpacer" class="spacer" :style="{ height: `${bottomSpacing + Math.max((inputs?.length || 0), (outputs?.length || 0)) * handleSpacing}px` }"></div>
   </div>
 </template>
 
@@ -157,11 +177,6 @@ function removeHandleEdges(handleId: string) {
 }
 .fade-enter-from, .fade-leave-to {
   opacity: 0;
-}
-
-.node-title
-{
-    font-size: 12px;
 }
 
 .node-body {

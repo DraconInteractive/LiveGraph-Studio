@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import BaseNode from '../components/BaseNode.vue'
+import BaseNode from '~/nodes/BaseNode.vue'
 
 const props = defineProps(['id', 'data'])
 
@@ -22,7 +22,10 @@ props.data.class = 'debug-log-node'
         :data="props.data"
         title="Debug Log"
         :inputs="inputs"
-        :outputs="outputs",
+        :outputs="outputs"
+        :render-title="true"
+        :render-body="true"
+        :render-spacer="true"
     />
 </template>
 
