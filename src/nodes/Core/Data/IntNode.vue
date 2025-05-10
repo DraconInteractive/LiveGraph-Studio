@@ -49,6 +49,9 @@ function validateInt() {
     props.data.value = parsed.toString()
     updateNodeData(props.id, { value: props.data.value })
   }
+  if (event?.target instanceof HTMLInputElement) {
+    event.target.blur()
+  }
 }
 </script>
 
@@ -70,7 +73,7 @@ function validateInt() {
                 <input
                 v-model="localValue"
                 type="text"
-                placeholder="Enter int..."
+                placeholder="0"
                 class="int-node-input"
                 @keyup.enter="validateInt"
                 @blur="validateInt"
