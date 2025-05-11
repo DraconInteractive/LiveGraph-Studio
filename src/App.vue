@@ -9,7 +9,7 @@ import Icon from './Icon.vue'
 import type { HandleDef } from "./types/HandleDef"
 import CustomEdge from './CustomEdge.vue'
 
-const { onConnect, addEdges, toObject, fromObject, onConnectStart, onConnectEnd } = useVueFlow()
+const { onConnect, addEdges, toObject, fromObject, onConnectStart, onConnectEnd, zoomIn, zoomOut } = useVueFlow()
 
 const history = ref<any[]>([])
 const historyIndex = ref(-1)
@@ -71,13 +71,12 @@ const categorizedNodeTypes = computed(() => {
   }
 
   return [
+    ...entries,
     ...[...subcategories].map(sub => ({
       type: sub,
       display: sub,
       isCategory: true
-    })),
-    ...entries
-  ]
+    }))  ]
 })
 
 function spawnMenuNode (type: string, params?: OnConnectStartParams)
@@ -125,6 +124,10 @@ onMounted(() => {
       undo()
     } else if (e.ctrlKey && e.key === 'y') {
       redo()
+    } else if (e.key === '+' || e.key === '=') {
+      zoomIn()
+    } else if (e.key === '-') {
+      zoomOut()
     }
 
   }
