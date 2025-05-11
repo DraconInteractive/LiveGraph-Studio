@@ -42,32 +42,48 @@ const edges = ref<Edge[]>([
 // Node menu
 const showNodeMenu = ref(false)
 const searchQuery = ref('')
-const currentCategory = ref<string | null>(null)
+const currentCategory = ref<string[]>([])
 
 const categorizedNodeTypes = computed(() => {
-  if (searchQuery.value.trim()) {
-    const results = nodeTypes
-      .filter(n =>
-        n.display.toLowerCase().includes(searchQuery.value.toLowerCase())
-      )
+  const query = searchQuery.value.trim().toLowerCase()
+
+  if (query) {
+    return nodeTypes
+      .filter(n => n.display.toLowerCase().includes(query))
       .map(n => ({ ...n, isCategory: false }))
-    console.log('Search results:', results)
-    return results
   }
 
-  if (!currentCategory.value) {
-    const categories = [...new Set(nodeTypes.map(n => n.category).filter(Boolean))]
-    const result = categories.map(c => ({ type: c, isCategory: true, display: c }))
-    console.log('Category listing:', result)
-    return result
+  const currentPath = currentCategory.value.join('/')
+  const subcategories = new Set<string>()
+  const entries: any[] = []
+
+  for (const node of nodeTypes) {
+    if (!node.category?.startsWith(currentPath)) continue
+
+    const remaining = node.category.slice(currentPath.length).replace(/^\/+/, '')
+    const [next] = remaining.split('/')
+
+    if (!remaining) {
+      entries.push({ ...node, isCategory: false })
+    } else {
+      subcategories.add(next)
+    }
   }
 
-  const filtered = nodeTypes
-    .filter(n => n.category === currentCategory.value)
-    .map(n => ({ ...n, isCategory: false }))
-  console.log('Category view:', filtered)
-  return filtered
+  return [
+    ...[...subcategories].map(sub => ({
+      type: sub,
+      display: sub,
+      isCategory: true
+    })),
+    ...entries
+  ]
 })
+
+function spawnMenuNode (type: string, params?: OnConnectStartParams)
+{
+  spawnNode(type)
+}
 
 function openNodeMenu () {
   showNodeMenu.value = true
@@ -75,11 +91,6 @@ function openNodeMenu () {
   nextTick(() => {
     nodeSearchInputRef.value?.focus()
   })
-}
-
-function spawnMenuNode (type: string, params?: OnConnectStartParams)
-{
-  spawnNode(type)
 }
 
 // Events
@@ -322,14 +333,14 @@ function showToast(message: string, duration = 2000) {
       <li
         v-for="item in categorizedNodeTypes"
         :key="item.display"
-        @click="item.isCategory ? currentCategory = item.type : spawnNode(item.type)"
-      >
+        @click="item.isCategory ? currentCategory.push(item.type) : spawnNode(item.type)"
+        >
         {{ item.isCategory ? `📁 ${item.type}` : item.display }}
       </li>
     </ul>
 
-    <div v-if="currentCategory && !searchQuery" style="margin-top: 8px;">
-      <button @click="currentCategory = null">← Return</button>
+    <div v-if="currentCategory.length && !searchQuery">
+      <button @click="currentCategory.pop()">← Return</button>
     </div>
   </div>
   <div style="height: 100vh" class="dark">
