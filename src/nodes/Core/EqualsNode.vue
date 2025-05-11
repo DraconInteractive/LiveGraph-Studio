@@ -8,15 +8,17 @@ import { colorMap, type DataType } from '../../utils/colorMap'
 const props = defineProps(['id', 'data'])
 const { updateNodeData, getEdges, removeEdges } = useVueFlow()
 
-const inputs: HandleDef[] = []
-
-const outputs: HandleDef[] = [
-  { id: 'Exec', dataType: 'exec' }
+const inputs = [
+  { id: 'A', dataType: 'unknown' },
+  { id: 'B', dataType: 'unknown' }
+]
+const outputs = [
+  { id: 'Result', dataType: 'bool' }
 ]
 
 props.data.inputs = inputs
 props.data.outputs = outputs
-props.data.class = 'entry-node'
+props.data.class = 'equals-node'
 
 function removeHandleEdges(handleId: string) {
     const edgesToRemove = getEdges.value.filter(
@@ -33,37 +35,32 @@ function removeHandleEdges(handleId: string) {
     <BaseNode
         :id="props.id"
         :data="props.data"
-        title="Run"
+        title="=="
         :inputs="inputs"
         :outputs="outputs"
-        :titleSpacing="18"
-        :handleSpacing="0"
+        :titleSpacing="30"
+        :bottomSpacing="26"
         :render-title="true"
         :render-body="false"
-        :render-spacer="false"
+        :render-spacer="true"
     >
-      <template #output-Exec="{handle}">
+    <template #output-Result="{handle}">
         <Handle
             :id="`source-${handle.id}`"
             type="source"
             :position="Position.Right"
             :style="{ 
-              transform: 'translate(50%, -50%)', 
-              borderColor: colorMap[handle.dataType as DataType] || colorMap.unknown, 
+                transform: 'translate(50%, 50%)', 
+                borderColor: colorMap[handle.dataType as DataType] || colorMap.unknown, 
             }"
             @contextmenu.prevent="removeHandleEdges(`source-${handle.id}`)"
-          />
-      </template>
+            />
+        </template>
     </BaseNode>
 </template>
 
 <style>
-.custom-node.entry-node {
-  background-color: green !important;
-  min-width: 75px;
-  min-height: 26px;
-  padding-left: 0px;
-  padding-right: 0px;
-  padding-bottom: 0px;
+.custom-node.equals-node {
+  min-width: 25px;
 }
 </style>
