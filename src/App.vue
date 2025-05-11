@@ -360,7 +360,7 @@ function showToast(message: string, duration = 2000) {
     >
       <Background pattern-color="#2e2e2e" :gap="22" :variant="BackgroundVariant.Lines" />
 
-      <MiniMap />
+      <!--<MiniMap />-->
 
       <Controls class="my-controls">
         <ControlButton @click="handleSave">

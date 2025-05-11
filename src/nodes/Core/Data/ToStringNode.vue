@@ -6,13 +6,15 @@ const props = defineProps(['id', 'data'])
 const inputs = [
   { id: 'Value', dataType: 'unknown' }
 ]
-const outputs = [
+const outputs = [ 
     { id: 'String', dataType: 'string' }
 ]
 
 props.data.inputs = inputs
 props.data.outputs = outputs
 props.data.class = 'to-string-node'
+
+// TODO remove handle labels, or shrink their font size
 </script>
 
 <template>
@@ -22,6 +24,9 @@ props.data.class = 'to-string-node'
         title="To String"
         :inputs="inputs"
         :outputs="outputs"
+        :titleSpacing="35"
+        :handleSpacing="26"
+        :bottomSpacing="18"
         :render-title="true"
         :render-body="true"
         :render-spacer="true"
@@ -30,5 +35,6 @@ props.data.class = 'to-string-node'
 
 <style>
 .custom-node.to-string-node {
+    min-width: 50px;
 }
 </style>
