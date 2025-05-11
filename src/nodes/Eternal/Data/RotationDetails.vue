@@ -4,29 +4,30 @@ import BaseNode from '~/nodes/BaseNode.vue'
 const props = defineProps(['id', 'data'])
 
 const inputs = [
-  { id: 'Value', dataType: 'unknown' }
+  { id: 'Rotation', dataType: 'rotation' }
 ]
-const outputs = [ 
-    { id: 'String', dataType: 'string' }
+const outputs = [
+  { id: 'X', dataType: 'float' },
+  { id: 'Y', dataType: 'float' },
+  { id: 'Z', dataType: 'float' },
+  { id: 'W', dataType: 'float' },
 ]
 
 props.data.inputs = inputs
 props.data.outputs = outputs
-props.data.class = 'to-string-node'
-
-// TODO remove handle labels, or shrink their font size
+props.data.class = 'rotation-node'
 </script>
 
 <template>
     <BaseNode
         :id="props.id"
         :data="props.data"
-        title="To String"
+        title="Rotation"
         :inputs="inputs"
         :outputs="outputs"
         :titleSpacing="35"
         :handleSpacing="26"
-        :bottomSpacing="10"
+        :bottomSpacing="89"
         :render-title="true"
         :render-body="true"
         :render-spacer="true"
@@ -34,7 +35,7 @@ props.data.class = 'to-string-node'
 </template>
 
 <style>
-.custom-node.to-string-node {
-    min-width: 50px;
+.custom-node.rotation-node {
+  min-width: 50px;
 }
 </style>

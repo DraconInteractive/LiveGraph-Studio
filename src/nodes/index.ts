@@ -7,6 +7,9 @@ import StringNode from './Core/Data/StringNode.vue'
 import ToStringNode from './Core/Data/ToStringNode.vue'
 import FloatNode from './Core/Data/FloatNode.vue'
 import BoolNode from './Core/Data/BoolNode.vue'
+import SentientDetails from './Eternal/Data/SentientDetails.vue'
+import PositionDetails from './Eternal/Data/PositionDetails.vue'
+import RotationDetails from './Eternal/Data/RotationDetails.vue'
 
 export const nodeTypes = [
     { type: 'debug-log', component: DebugLogNode, category: 'Debug', display: 'Debug Log' },
@@ -18,5 +21,10 @@ export const nodeTypes = [
     { type: 'to-string-node', component: ToStringNode, category: 'Data', display: 'To String'},
     { type: 'find-sentient-name-node', component: FindSentientByNameNode, category: 'Eternal/Data', display: 'Find Sentient by Name'},
     { type: 'find-sentient-id-node', component: FindSentientByIDNode, category: 'Eternal/Data', display: 'Find Sentient by ID'},
+    { type: 'sentient-node', component: SentientDetails, category: 'Eternal/Data', display: 'Sentient'},
+    { type: 'position-node', component: PositionDetails, category: 'Eternal/Data', display: 'Position'},
+    { type: 'rotation-node', component: RotationDetails, category: 'Eternal/Data', display: 'Rotation'},
+
+
   ]
 

@@ -213,7 +213,7 @@ function removeHandleEdges(handleId: string) {
   display: flex;
   align-items: center;
   pointer-events: none;
-  padding: 0 8px; /* adds space inside node */
+  padding: 0 6px; /* adds space inside node */
 }
 
 .handle-container.right .handle-content {
@@ -227,11 +227,11 @@ function removeHandleEdges(handleId: string) {
 }
 
 .handle-label {
-  font-size: 10px;
+  font-size: 7px;
   color: #ccc;
   white-space: nowrap;
   pointer-events: none;
-  margin: 0 6px;
+  margin: 0 4px;
 }
 
 /* Toolbar */
