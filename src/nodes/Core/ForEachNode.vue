@@ -5,27 +5,28 @@ const props = defineProps(['id', 'data'])
 
 const inputs = [
   { id: 'Exec', dataType: 'exec' },
-  { id: 'Sentient', dataType: 'sentient' },
-  { id: 'Position', dataType: 'position' }
+  { id: 'Array', dataType: 'unknown' }
 ]
 const outputs = [
-  { id: 'Exec', dataType: 'exec' }
+  { id: 'Exec', dataType: 'exec' },
+  { id: 'Loop Body', dataType: 'exec'},
+  { id: 'Element', dataType: 'unknown'}
 ]
 
 props.data.inputs = inputs
 props.data.outputs = outputs
-props.data.class = 'sentient-move-node'
+props.data.class = 'for-each-node'
 </script>
 
 <template>
     <BaseNode
         :id="props.id"
         :data="props.data"
-        title="Sentient - Move To"
+        title="For Each"
         :inputs="inputs"
         :outputs="outputs"
         :titleSpacing="35"
-        :bottomSpacing="42"
+        :bottomSpacing="38"
         :render-title="true"
         :render-body="true"
         :render-spacer="true"
@@ -33,7 +34,7 @@ props.data.class = 'sentient-move-node'
 </template>
 
 <style>
-.custom-node.sentient-move-node {
+.custom-node.for-each-node {
   min-width: 50px;
 }
 </style>

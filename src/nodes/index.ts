@@ -11,10 +11,13 @@ import SentientDetails from './Eternal/Data/SentientDetails.vue'
 import PositionDetails from './Eternal/Data/PositionDetails.vue'
 import RotationDetails from './Eternal/Data/RotationDetails.vue'
 import MoveSentientNode from './Eternal/Actions/MoveSentientNode.vue'
+import AllSentients from './Eternal/Data/AllSentients.vue'
+import ForEachNode from './Core/ForEachNode.vue'
 
 export const nodeTypes = [
     { type: 'debug-log', component: DebugLogNode, category: 'Debug', display: 'Debug Log' },
     { type: 'run', component: EntryNode, category: 'Control', display: 'Entry' },
+    { type: 'for-each-node', component: ForEachNode, category: 'Control', display: 'For Each' },
     { type: 'string-literal', component: StringNode, category: 'Data/Primitives', display: 'String' },
     { type: 'float-literal', component: FloatNode, category: 'Data/Primitives', display: 'Float'},
     { type: 'int-literal', component: IntNode, category: 'Data/Primitives', display: 'Int' },
@@ -26,6 +29,7 @@ export const nodeTypes = [
     { type: 'position-node', component: PositionDetails, category: 'Eternal/Data', display: 'Position'},
     { type: 'rotation-node', component: RotationDetails, category: 'Eternal/Data', display: 'Rotation'},
     { type: 'sentient-move-node', component: MoveSentientNode, category: 'Eternal/Actions', display: 'Sentient - Move To'},
+    { type: 'all-sentients-node', component: AllSentients, category: 'Eternal/Data', display: 'Sentients - All'},
 
 
   ]

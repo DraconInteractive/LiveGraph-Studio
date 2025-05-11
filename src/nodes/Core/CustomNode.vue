@@ -12,7 +12,7 @@ const outputs = ['One', 'Two', 'Three', 'Four']
 const inputs = ['A', 'B']
 
 const titleHeight = 38 // enough room for title + body text
-const handleSpacing = 28
+const handleSpacing = 22
 const bottomSpacing = 5;
 
 const getHandleTop = (index: number) => {

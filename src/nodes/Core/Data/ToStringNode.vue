@@ -25,7 +25,6 @@ props.data.class = 'to-string-node'
         :inputs="inputs"
         :outputs="outputs"
         :titleSpacing="35"
-        :handleSpacing="26"
         :bottomSpacing="10"
         :render-title="true"
         :render-body="true"

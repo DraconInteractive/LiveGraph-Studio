@@ -26,7 +26,7 @@ const props = defineProps<{
 
 const titleSpacing = props.titleSpacing ?? 45
 const titleFontSize = props.titleFontSize ?? 8
-const handleSpacing = props.handleSpacing ?? 28 // Default to 28 if not provided
+const handleSpacing = props.handleSpacing ?? 16 // Default to 22 if not provided
 const bottomSpacing = props.bottomSpacing ?? 0  // Default to 0 if not provided
 
 const renderTitle = props.renderTitle ?? true
