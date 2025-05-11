@@ -102,24 +102,42 @@ onMounted(() => {
   historyIndex.value = 0
 
   const listener = (e: KeyboardEvent) => {
+    const target = e.target as HTMLElement
+    const tag = target?.tagName?.toLowerCase()
+    const active = document.activeElement as HTMLElement
+
+    if (e.key === 'Escape') {
+      showNodeMenu.value = false
+      if (active && typeof active.blur === 'function') {
+        active.blur()
+      }
+    }
+    else if (e.key === 'Enter')
+    {
+      if (showNodeMenu.value)
+      {
+        const menuNodes = categorizedNodeTypes
+        if (menuNodes.value.length > 0)
+        {
+          spawnMenuNode(menuNodes.value[0].type)
+        }
+        showNodeMenu.value = false
+      }
+      if (active && typeof active.blur === 'function') {
+        active.blur()
+      }
+    }
+
+    // Don't trigger hotkeys when typing in inputs or textareas
+    if (tag === 'input' || tag === 'textarea' || target?.isContentEditable) return
+
     if (e.ctrlKey && e.key.toLowerCase() === 's') {
       e.preventDefault()
       handleSave()
       return
-    }
-
-    if (e.shiftKey && e.key.toLowerCase() === 'a') {
+    } else if (e.shiftKey && e.key.toLowerCase() === 'a') {
       e.preventDefault()
       openNodeMenu()
-    } else if (e.key === 'Escape') {
-      showNodeMenu.value = false
-    } else if (showNodeMenu && e.key === 'Enter') {
-      const menuNodes = categorizedNodeTypes
-      if (menuNodes.value.length > 0)
-      {
-        spawnMenuNode(menuNodes.value[0].type)
-      }
-      showNodeMenu.value = false
     } else if (e.ctrlKey && e.key === 'z') {
       undo()
     } else if (e.ctrlKey && e.key === 'y') {

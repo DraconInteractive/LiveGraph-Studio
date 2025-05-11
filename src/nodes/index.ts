@@ -10,6 +10,7 @@ import BoolNode from './Core/Data/BoolNode.vue'
 import SentientDetails from './Eternal/Data/SentientDetails.vue'
 import PositionDetails from './Eternal/Data/PositionDetails.vue'
 import RotationDetails from './Eternal/Data/RotationDetails.vue'
+import MoveSentientNode from './Eternal/Actions/MoveSentientNode.vue'
 
 export const nodeTypes = [
     { type: 'debug-log', component: DebugLogNode, category: 'Debug', display: 'Debug Log' },
@@ -24,6 +25,7 @@ export const nodeTypes = [
     { type: 'sentient-node', component: SentientDetails, category: 'Eternal/Data', display: 'Sentient'},
     { type: 'position-node', component: PositionDetails, category: 'Eternal/Data', display: 'Position'},
     { type: 'rotation-node', component: RotationDetails, category: 'Eternal/Data', display: 'Rotation'},
+    { type: 'sentient-move-node', component: MoveSentientNode, category: 'Eternal/Actions', display: 'Sentient - Move To'},
 
 
   ]
