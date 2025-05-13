@@ -91,7 +91,7 @@ function removeHandleEdges(handleId: string) {
 
 <style>
 .custom-node.find-sentient-id-node {
-  background-color: purple !important;
+  border-color: purple !important;
   min-width: 50px;
   min-height: 15px;
   padding-left: 15px;

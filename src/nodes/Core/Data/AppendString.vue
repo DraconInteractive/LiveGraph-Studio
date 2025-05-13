@@ -1,29 +1,30 @@
 <script setup lang="ts">
 import BaseNode from '~/nodes/BaseNode.vue'
-import { HandleDef } from '~/types/HandleDef'
 
 const props = defineProps(['id', 'data'])
 
-const inputs: HandleDef[] = []
-
+const inputs = [
+  { id: 'A', dataType: 'string' },
+  { id: 'B', dataType: 'string' }
+]
 const outputs = [
-  { id: 'All', dataType: 'sentient' }
+  { id: 'String', dataType: 'string' }
 ]
 
 props.data.inputs = inputs
 props.data.outputs = outputs
-props.data.class = 'all-sentients-node'
+props.data.class = 'append-string-node'
 </script>
 
 <template>
     <BaseNode
         :id="props.id"
         :data="props.data"
-        title="All Sentients"
+        title="Append"
         :inputs="inputs"
         :outputs="outputs"
         :titleSpacing="35"
-        :bottomSpacing="12"
+        :bottomSpacing="28"
         :render-title="true"
         :render-body="true"
         :render-spacer="true"
@@ -31,8 +32,8 @@ props.data.class = 'all-sentients-node'
 </template>
 
 <style>
-.custom-node.all-sentients-node {
+.custom-node.append-string-node {
   min-width: 50px;
-  border-color: purple;
+  border-color: rosybrown;
 }
 </style>

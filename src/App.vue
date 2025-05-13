@@ -127,6 +127,10 @@ onMounted(() => {
         active.blur()
       }
     }
+    else if(e.ctrlKey && e.key.toLowerCase() === 'l')
+    {
+      spawnMenuNode('route-node')
+    }
 
     // Don't trigger hotkeys when typing in inputs or textareas
     if (tag === 'input' || tag === 'textarea' || target?.isContentEditable) return

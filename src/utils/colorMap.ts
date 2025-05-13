@@ -1,9 +1,9 @@
 export type DataType = 'string' | 'int' | 'bool' | 'customType' | 'unknown' | 'exec' | 'sentient' | 'position' | 'rotation'
 
 export const colorMap: Record<DataType, string> = {
-  string: 'hotpink',
+  string: 'rosybrown',
   int: 'skyblue',
-  bool: 'orange',
+  bool: 'red',
   customType: 'lime',
   unknown: 'gray',
   exec: 'white',

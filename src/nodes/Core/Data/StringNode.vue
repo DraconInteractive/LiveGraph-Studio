@@ -83,7 +83,7 @@ function removeHandleEdges(handleId: string) {
 
 <style>
 .custom-node.string-node {
-  background-color: rosybrown !important;
+  border-color: rosybrown !important;
   min-width: 50px;
   min-height: 15px;
   padding-left: 0px;

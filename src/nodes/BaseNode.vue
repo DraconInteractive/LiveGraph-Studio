@@ -34,7 +34,6 @@ const renderBody = props.renderBody ?? true
 const renderSpacer = props.renderSpacer ?? true
 
 const showDelete = ref(false);
-
 const getHandleTop = (index: number) =>
 titleSpacing + index * handleSpacing
 

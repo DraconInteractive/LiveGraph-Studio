@@ -36,5 +36,7 @@ props.data.class = 'sentient-node'
 <style>
 .custom-node.sentient-node {
   min-width: 50px;
+  border-color: purple;
+
 }
 </style>
