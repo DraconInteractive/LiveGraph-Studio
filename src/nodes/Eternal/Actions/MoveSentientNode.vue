@@ -9,7 +9,8 @@ const inputs = [
   { id: 'Position', dataType: 'position' }
 ]
 const outputs = [
-  { id: 'Exec', dataType: 'exec' }
+  { id: 'Exec', dataType: 'exec' },
+  { id: 'Done', dataType: 'exec' }
 ]
 
 props.data.inputs = inputs
